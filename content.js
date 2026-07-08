@@ -1,28 +1,30 @@
-// Get latest archive.is link and redirect
-function processArchiveDOM() {
+// Exit immediately if the hash is missing; indicates manual access by the user
+if (window.location.hash === '#auto_redirect=1') {
 
-  const newestLink = document.querySelector('#row0 .TEXT-BLOCK a');
+  // Helper function to find the newest archive link and perform the redirect
+  const processArchiveDOM = () => {
+    const newestLink = document.querySelector('#row0 .TEXT-BLOCK a');
 
-  // Might be blocked by a captcha or the page might not be fully loaded yet
-  if (newestLink && newestLink.href) {
-    window.location.href = newestLink.href;
-    return true; // Signals the observer that we were successful
-  }
-
-  return false; // Blocked for some reason (captcha, not loaded yet, etc.)
-}
-
-// Check on page load
-if (!processArchiveDOM()) {
-  
-  // wait for page changes
-  const observer = new MutationObserver((mutations, obs) => {
-    if (processArchiveDOM()) {
-      // Disconnect observer immediately once the link is found and clicked
-      obs.disconnect(); 
+    // Redirect if the link is found (no captcha, page fully loaded)
+    if (newestLink && newestLink.href) {
+      window.location.href = newestLink.href;
+      return true; // Successfully redirected
     }
-  });
 
-  // Start monitoring the document body for structural changes
-  observer.observe(document.body, { childList: true, subtree: true });
+    return false; // Failed to redirect (possibly blocked by captcha or page is still loading)
+  };
+
+  // Initial check on page load
+  if (!processArchiveDOM()) {
+    
+    // If the page loads asynchronously, monitor the DOM for structural changes
+    const observer = new MutationObserver((mutations, obs) => {
+      if (processArchiveDOM()) {
+        obs.disconnect(); // Disconnect the observer once the redirect has been triggered
+      }
+    });
+
+    // Start monitoring the document body
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 }
