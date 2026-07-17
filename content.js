@@ -1,11 +1,19 @@
 // Exit immediately if the hash is missing; indicates manual access by the user
 if (window.location.hash === '#auto_redirect=1') {
 
+  let decodedPath = '';
+
   // Only run on search, submission or newest routing paths
   // Prevents running unnecessary mutation observers on final static archive articles
   // Use decodeURIComponent and toLowerCase to handle both percent encoded 
   // and raw paths robustly
-  const decodedPath = decodeURIComponent(window.location.pathname).toLowerCase();
+  // Prevent runtime crashes on malformed URLs
+  try {
+    decodedPath = decodeURIComponent(window.location.pathname).toLowerCase();
+  } catch (e) {
+    decodedPath = window.location.pathname.toLowerCase(); // Fallback to raw path if decoding fails
+  }
+
   const isSearchOrSubmitPage = 
     decodedPath === '/' || 
     decodedPath.startsWith('/newest/') || 
