@@ -3,11 +3,14 @@ if (window.location.hash === '#auto_redirect=1') {
 
   // Only run on search, submission or newest routing paths
   // Prevents running unnecessary mutation observers on final static archive articles
+  // Use decodeURIComponent and toLowerCase to handle both percent encoded 
+  // and raw paths robustly
+  const decodedPath = decodeURIComponent(window.location.pathname).toLowerCase();
   const isSearchOrSubmitPage = 
-    window.location.pathname === '/' || 
-    window.location.pathname.startsWith('/newest/') || 
-    window.location.pathname.startsWith('/http://') || 
-    window.location.pathname.startsWith('/https://');
+    decodedPath === '/' || 
+    decodedPath.startsWith('/newest/') || 
+    decodedPath.startsWith('/http://') || 
+    decodedPath.startsWith('/https://');
 
   if (isSearchOrSubmitPage) {
 
@@ -38,7 +41,7 @@ if (window.location.hash === '#auto_redirect=1') {
       // Case 3: "No results" found, redirect to the archive creation page
       const archiveLink = document.querySelector('a[href*="?url="]');
       if (archiveLink && archiveLink.href) {
-        // Append the hash so extension script is triggered
+        // Append the hash so extension script is triggered on the next page
         const targetUrl = new URL(archiveLink.href, window.location.origin);
         targetUrl.hash = '#auto_redirect=1';
         window.location.href = targetUrl.toString();
