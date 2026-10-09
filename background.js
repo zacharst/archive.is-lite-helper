@@ -4,8 +4,7 @@ chrome.action.onClicked.addListener((tab) => {
     // Remove tracking parameters
     const cleanUrl = sanitizeUrl(tab.url);
     
-    // REVERT: We go back to the standard search URL to avoid archive.is's aggressive CAPTCHA defenses on the /newest/ endpoint
-    // this way no captcha is triggered and the extension can auto-submit the URL without user intervention
+    
     // Append a hash (#auto_redirect=1) to the archive.is URL to indicate that the redirect should be automatic
     const archiveUrl = `https://archive.is/newest/${encodeURIComponent(cleanUrl)}#auto_redirect=1`;
     
